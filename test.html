@@ -6,7 +6,7 @@
 <body>
     <input type="file" id="foregroundImageInput" accept="image/*">
     <button id="combineAndDownloadButton">Combine and Download</button>
-    <canvas id="canvas" width="500" height="450" style="display: none;"></canvas>
+    <canvas id="canvas" width="2104" height="2100" style="display: none;"></canvas>
     <img id="resultImage">
 
     <script>
@@ -18,8 +18,8 @@
             function compositeCircularImages(backgroundImage, croppedForegroundImage) {
                 const ctx = canvas.getContext("2d");
                 const centerX = canvas.width / 2;
-                const centerY = canvas.height / 2;
-                const radius = Math.min(canvas.width, canvas.height) / 3.85;
+                const centerY = (canvas.height / 2) - 89;
+                const radius = Math.min(canvas.width, canvas.height) / 4.5;
 
                 // Draw the background image onto the canvas
                 ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
@@ -75,7 +75,7 @@
                 const downloadLink = document.createElement("a");
                 downloadLink.href = canvas.toDataURL("image/jpg");
                 downloadLink.download = "VPF.jpg";
-                downloadLink.click();
+                // downloadLink.click();
             }
     </script>
 </body>
