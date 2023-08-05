@@ -4,43 +4,79 @@
   <title>Image Compositing</title>
 </head>
 <body>
-    <center>
-        <canvas id="canvas" width="500" height="450"></canvas>
-    </center>
+    <input type="file" id="foregroundImageInput" accept="image/*">
+    <button id="combineAndDownloadButton">Combine and Download</button>
+    <canvas id="canvas" width="500" height="450" style="display: none;"></canvas>
+    <img id="resultImage">
+
     <script>
-        // Function to composite two circular images onto a canvas
-        function compositeCircularImages(backgroundImage, foregroundImage) {
-        const canvas = document.getElementById("canvas");
-        const ctx = canvas.getContext("2d");
-        const centerX = canvas.width / 2;
-        const centerY = canvas.height / 2;
-        const radius = Math.min((canvas.width, canvas.height) / 3.9);
+        document.addEventListener("DOMContentLoaded", () => {
+            const canvas = document.getElementById("canvas");
+            const resultImage = document.getElementById("resultImage");
 
-        // Draw the background image onto the canvas
-        ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+            // Function to composite circular images onto a canvas
+            function compositeCircularImages(backgroundImage, croppedForegroundImage) {
+                const ctx = canvas.getContext("2d");
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                const radius = Math.min(canvas.width, canvas.height) / 3.85;
 
-        // Draw the circular foreground image at the center
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-        ctx.clip(); // Clip the context to a circular path
-        ctx.drawImage(foregroundImage, centerX - radius, centerY - radius, radius * 2, radius * 2);
-        ctx.restore();
-        }
+                // Draw the background image onto the canvas
+                ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
 
-        // Load the images and call the compositeCircularImages function
-        const backgroundImage = new Image();
-        backgroundImage.src = "temp.jpg";
+                // Draw the circular foreground image at the center
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+                ctx.clip(); // Clip the context to a circular path
+                ctx.drawImage(croppedForegroundImage, centerX - radius, centerY - radius, radius * 2, radius * 2);
+                ctx.restore();
+            }
 
-        const foregroundImage = new Image();
-        foregroundImage.src = "kalash.jpg";
+            // Load the background image and call the compositeCircularImages function
+            const backgroundImage = new Image();
+            backgroundImage.src = "temp.jpg";
 
-        // Wait for the images to load
-        Promise.all([new Promise((resolve) => backgroundImage.onload = resolve), new Promise((resolve) => foregroundImage.onload = resolve)])
-        .then(() => {
-            compositeCircularImages(backgroundImage, foregroundImage);
+            // Function to handle the Combine and Download button click
+            const combineAndDownloadButton = document.getElementById("combineAndDownloadButton");
+            combineAndDownloadButton.addEventListener("click", () => {
+                const foregroundImageInput = document.getElementById("foregroundImageInput");
+                const foregroundImage = new Image();
+                foregroundImage.onload = () => {
+                    const croppedForegroundImage = cropToSquare(foregroundImage);
+                    compositeCircularImages(backgroundImage, croppedForegroundImage);
+                    resultImage.src = canvas.toDataURL("image/jpg");
+                    downloadImage(canvas);
+                };
+                if (foregroundImageInput.files && foregroundImageInput.files[0]) {
+                    foregroundImage.src = URL.createObjectURL(foregroundImageInput.files[0]);
+                }
+            });
+
+            // Function to crop the image to a square in the middle
+            function cropToSquare(image) {
+                const size = Math.min(image.width, image.height);
+                const offsetX = (image.width - size) / 2;
+                const offsetY = (image.height - size) / 2;
+
+                const tempCanvas = document.createElement("canvas");
+                tempCanvas.width = size;
+                tempCanvas.height = size;
+
+                const ctx = tempCanvas.getContext("2d");
+                ctx.drawImage(image, offsetX, offsetY, size, size, 0, 0, size, size);
+
+                return tempCanvas;
+            }
         });
-
+        
+    // Function to download the combined image
+    function downloadImage(canvas) {
+                const downloadLink = document.createElement("a");
+                downloadLink.href = canvas.toDataURL("image/jpg");
+                downloadLink.download = "VPF.jpg";
+                downloadLink.click();
+            }
     </script>
 </body>
 </html>
