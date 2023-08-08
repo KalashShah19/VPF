@@ -5,7 +5,8 @@
 </head>
 <body>
     <input type="file" id="foregroundImageInput" accept="image/*">
-    <button id="combineAndDownloadButton">Combine and Download</button>
+    <input type="text" id="input">
+    <button id="combineAndDownloadButton">Download</button>
     <canvas id="canvas" width="2104" height="2100" style="display: none;"></canvas>
     <img id="resultImage">
 
@@ -13,13 +14,14 @@
         document.addEventListener("DOMContentLoaded", () => {
             const canvas = document.getElementById("canvas");
             const resultImage = document.getElementById("resultImage");
+            const input = document.getElementById("input");
 
             // Function to composite circular images onto a canvas
-            function compositeCircularImages(backgroundImage, croppedForegroundImage) {
+            function compositeCircularImages(backgroundImage, croppedForegroundImage, text) {
                 const ctx = canvas.getContext("2d");
                 const centerX = canvas.width / 2;
-                const centerY = (canvas.height / 2) - 89;
-                const radius = Math.min(canvas.width, canvas.height) / 4.5;
+                const centerY = canvas.height / 2;
+                const radius = Math.min(canvas.width, canvas.height) / 3.85;
 
                 // Draw the background image onto the canvas
                 ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
@@ -31,6 +33,12 @@
                 ctx.clip(); // Clip the context to a circular path
                 ctx.drawImage(croppedForegroundImage, centerX - radius, centerY - radius, radius * 2, radius * 2);
                 ctx.restore();
+
+                // Add text in the specified area
+                ctx.font = "200px Arial";
+                ctx.fillStyle = "black";
+                ctx.textAlign = "center";
+                ctx.fillText(text, canvas.width / 2, 1700); // Adjust Y-coordinate as needed
             }
 
             // Load the background image and call the compositeCircularImages function
@@ -40,12 +48,14 @@
             // Function to handle the Combine and Download button click
             const combineAndDownloadButton = document.getElementById("combineAndDownloadButton");
             combineAndDownloadButton.addEventListener("click", () => {
+                console.log("click");
                 const foregroundImageInput = document.getElementById("foregroundImageInput");
                 const foregroundImage = new Image();
                 foregroundImage.onload = () => {
                     const croppedForegroundImage = cropToSquare(foregroundImage);
-                    compositeCircularImages(backgroundImage, croppedForegroundImage);
-                    resultImage.src = canvas.toDataURL("image/jpg");
+                    const text = input.value;
+                    compositeCircularImages(backgroundImage, croppedForegroundImage, text);
+                    // resultImage.src = canvas.toDataURL("image/jpeg");
                     downloadImage(canvas);
                 };
                 if (foregroundImageInput.files && foregroundImageInput.files[0]) {
@@ -75,7 +85,8 @@
                 const downloadLink = document.createElement("a");
                 downloadLink.href = canvas.toDataURL("image/jpg");
                 downloadLink.download = "VPF.jpg";
-                // downloadLink.click();
+                console.log("downloading");
+                downloadLink.click();
             }
     </script>
 </body>
