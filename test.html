@@ -2,15 +2,37 @@
 <html>
 <head>
   <title>Image Compositing</title>
+  <style>
+    #combineAndDownloadButton{
+        color: black;
+        background-color: rgb(0, 255, 0);
+        width: 250px;
+        height: 50px;
+        font-size: larger;
+        border-radius: 15px;
+    }
+
+    #foregroundImageInput, #input{
+        color: black;
+        font-size: larger;
+        width: 80%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 15px;
+    }
+</style>
 </head>
 <body>
-    <input type="file" id="foregroundImageInput" accept="image/*">
-    <input type="text" id="input">
-    <button id="combineAndDownloadButton">Download</button>
-    <canvas id="canvas" width="2104" height="2100" style="display: none;"></canvas>
-    <img id="resultImage">
-
-    <script>
+    <center>
+        <input type="text" id="input"> <br>
+        <input type="file" id="foregroundImageInput" accept="image/*"><br>
+        <button id="combineAndDownloadButton">Download</button>
+        <canvas id="canvas" width="2104" height="2100" style="display: none;"></canvas>
+        <img id="resultImage">
+    </center>
+        
+        <script>
         document.addEventListener("DOMContentLoaded", () => {
             const canvas = document.getElementById("canvas");
             const resultImage = document.getElementById("resultImage");
@@ -20,8 +42,8 @@
             function compositeCircularImages(backgroundImage, croppedForegroundImage, text) {
                 const ctx = canvas.getContext("2d");
                 const centerX = canvas.width / 2;
-                const centerY = canvas.height / 2;
-                const radius = Math.min(canvas.width, canvas.height) / 3.85;
+                const centerY = (canvas.height / 2) - 89;
+                const radius = Math.min(canvas.width, canvas.height) / 4.5;
 
                 // Draw the background image onto the canvas
                 ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
@@ -48,14 +70,13 @@
             // Function to handle the Combine and Download button click
             const combineAndDownloadButton = document.getElementById("combineAndDownloadButton");
             combineAndDownloadButton.addEventListener("click", () => {
-                console.log("click");
                 const foregroundImageInput = document.getElementById("foregroundImageInput");
                 const foregroundImage = new Image();
                 foregroundImage.onload = () => {
                     const croppedForegroundImage = cropToSquare(foregroundImage);
                     const text = input.value;
                     compositeCircularImages(backgroundImage, croppedForegroundImage, text);
-                    // resultImage.src = canvas.toDataURL("image/jpeg");
+                    resultImage.src = canvas.toDataURL("image/jpg");
                     downloadImage(canvas);
                 };
                 if (foregroundImageInput.files && foregroundImageInput.files[0]) {
@@ -85,7 +106,6 @@
                 const downloadLink = document.createElement("a");
                 downloadLink.href = canvas.toDataURL("image/jpg");
                 downloadLink.download = "VPF.jpg";
-                console.log("downloading");
                 downloadLink.click();
             }
     </script>
