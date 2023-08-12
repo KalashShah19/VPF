@@ -57,10 +57,10 @@
                 ctx.restore();
 
                 // Add text in the specified area
-                ctx.font = "200px Arial";
+                ctx.font = "180px Arial";
                 ctx.fillStyle = "black";
                 ctx.textAlign = "center";
-                ctx.fillText(text, canvas.width / 2, 1700); // Adjust Y-coordinate as needed
+                ctx.fillText(text, canvas.width / 2, 1690); // Adjust Y-coordinate as needed
             }
 
             // Load the background image and call the compositeCircularImages function
@@ -74,9 +74,8 @@
                 const foregroundImage = new Image();
                 foregroundImage.onload = () => {
                     const croppedForegroundImage = cropToSquare(foregroundImage);
-                    const text = input.value;
+                    const text = input.value.toUpperCase();
                     compositeCircularImages(backgroundImage, croppedForegroundImage, text);
-                    resultImage.src = canvas.toDataURL("image/jpg");
                     downloadImage(canvas);
                 };
                 if (foregroundImageInput.files && foregroundImageInput.files[0]) {
